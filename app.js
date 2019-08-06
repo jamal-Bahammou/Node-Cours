@@ -1,119 +1,38 @@
-const fs = require('fs');
-
 const express = require('express');
 const app = express();
 
-// ADD A MIDLEWARE:
+const morgan = require('morgan');
+
+const tourRouter = require('./routes/tourRouters');
+const userRouter = require('./routes/userRouters');
+
+// ADD A MIDLEWARE: --------------------------------------------
+
 app.use(express.json());
 
-// Take the tours from json file: --------------------------------
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
-);
+// 🚧 🚧 🚧
+console.log(process.env.NODE_ENV);
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
-// GET all tours: ----------------------------------------------
-const getAllTours = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      tours: tours
-    }
-  });
-};
+app.use(express.static(`${__dirname}/public`));
 
-// GET single tour: --------------------------------------------
-const getSingleTour = (req, res) => {
-  const id = req.params.id * 1;
-  const tour = tours.find(el => el.id === id);
-
-  if (!tour) {
-    return res.status(404).json({
-      status: 'Fail ❌',
-      message: 'Invalid Id'
-    });
-  }
-
-  res.status(200).json({
-    status: 'success ✔️',
-    data: {
-      tour
-    }
-  });
-};
-
-// POST a new tour: --------------------------------------------
-const addTour = (req, res) => {
-  const newID = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newID }, req.body);
-
-  // Add the new tour to the array of tours from json file: 💯
-  tours.push(newTour);
-
-  // Add the new tour to the json file: 💯
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    err => {
-      res.status(201).json({
-        status: 'success ✔️',
-        data: {
-          tour: newTour
-        }
-      });
-    }
-  );
-};
-
-// PATCH update a tour: ----------------------------------------
-const updateTour = (req, res) => {
-  if (req.params.id * 1 > tours.length) {
-    return res.status(404).json({
-      status: 'Fail ❌',
-      message: 'Invalid Id'
-    });
-  }
-
-  res.status(200).json({
-    status: 'success ✔️',
-    data: {
-      tour: '<Updated tour here...>'
-    }
-  });
-};
-// DELETE a tour: ----------------------------------------------
-const deleteTour = (req, res) => {
-  if (req.params.id * 1 > tours.length) {
-    return res.status(404).json({
-      status: 'Fail ❌',
-      message: 'Invalid Id'
-    });
-  }
-
-  res.status(204).json({
-    status: 'success ✔️',
-    data: null
-  });
-};
-
-// MAIN function: ----------------------------------------------
-
-app
-  .route('/api/v1/tours')
-  .get(getAllTours)
-  .post(addTour);
-
-app
-  .route('/api/v1/tours/:id')
-  .get(getSingleTour)
-  .patch(updateTour)
-  .delete(deleteTour);
-
-// LUNCH the server to work: -----------------------------------
-const port = 3000;
-app.listen(port, () => {
-  console.log(`App running on port ${port}....`);
+app.use((req, res, next) => {
+  console.log('Hello from the midleware ⚡️ ⚡️ ');
+  next();
 });
+
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
+
+// MAIN ROUTERS: ----------------------------------------------
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
+
+module.exports = app;
 
 // MAIN function: ----------------------------------------------
 // app.get('/api/v1/tours', getAllTours);

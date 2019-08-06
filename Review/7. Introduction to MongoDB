@@ -1,0 +1,20 @@
+mongoDB command:
+☘️ mongod: start the server port :27017
+☘️ mongo: lunch the database to the server
+
+1️⃣ use db_name: switch to a db, if the database donsn't exit, the command create one
+2️⃣ show dbs: show database exit
+3️⃣ show collections: show the collections in database
+4️⃣ db.collection_name.insertOne({ , , }): Create a collection example tours
+5️⃣ db.collection_name.insertMany([{}, {}]): add many of fil to collection
+6️⃣ db.collection_name.find({ filter }): show the content of collection_name
+   {price: { $lte: 500 }}: and filter price last then of equal 500
+   {price: { $lt: 500 }, rating: { $gte: 4.8 }} : and filter price greter then 500 && rating equal to 4.8
+   { $or: [ {price: {$lt: 300}}, {rating: {$gt: 4.8}} ] }: or filter
+   {filter}, {name: 1}: show just the id and the name
+7️⃣ db.collection_name.updateOne({ name: "name" }, { $set: { price: 597 } }): update a specifique file 
+8️⃣ db.tours.updateMany( { price: { $gt: 500 } , rating: { $gte: 4.8 }}, { $set: { premium: true } } ): update a lot of files
+9️⃣ db.tours.deleteMany({ rating: { $lte: 4.8 } }): delete data from the file.
+🔟 Install the mongoDB tools to work with the database: MongoDB Compass
+🍞 Start using the hosted database of mongoDB Atlas: create a project and a new customer
+🍞 Connect the mongoDB online with the localhost and shell terminal
